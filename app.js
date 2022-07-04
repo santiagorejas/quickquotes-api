@@ -12,6 +12,7 @@ const bodyParser = require("body-parser");
 const userRoutes = require("./routes/user-routes");
 const quoteRoutes = require("./routes/quote-routes");
 const likeRoutes = require("./routes/like-routes");
+const commentRoutes = require("./routes/comment-routes");
 
 app.use(bodyParser.json());
 
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
 app.use("/user", userRoutes);
 app.use("/quote", quoteRoutes);
 app.use("/like", likeRoutes);
+app.use("/comment", commentRoutes);
 
 app.use((err, req, res, next) => {
     res.json({ message: err.message });
