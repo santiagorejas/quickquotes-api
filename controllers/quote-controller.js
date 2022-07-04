@@ -138,7 +138,7 @@ const deleteQuote = async (req, res, next) => {
     }
 
     try {
-        quote.remove();
+        await quote.remove();
     } catch (err) {
         return next(new HttpError("Falló el borrado del quote.", 500));
     }

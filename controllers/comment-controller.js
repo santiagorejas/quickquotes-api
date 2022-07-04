@@ -35,4 +35,41 @@ const createComment = async (req, res, next) => {
     res.json({ comment });
 };
 
+const deleteComment = async (req, res, next) => {
+    const { nickname } = req.userData;
+    const { cid } = req.params;
+
+    let comment;
+    try {
+        comment = await Comment.findById(cid);
+    } catch (err) {
+        return next(new HttpError("Fallo en la búsqueda del comentario.", 500));
+    }
+
+    if (!comment) {
+        return next(
+            new HttpError("El comentario que se desea borrar no existe.", 404)
+        );
+    }
+
+    if (comment.author !== nickname) {
+        return next(
+            new HttpError("No podés borrar un comentario que no es tuyo.", 401)
+        );
+    }
+
+    try {
+        await comment.remove();
+    } catch (err) {
+        return next(
+            new HttpError("Ocurrió un error al borrar el comentario.", 500)
+        );
+    }
+
+    res.json({
+        message: "Mensaje borrado correctamente.",
+    });
+};
+
 exports.createComment = createComment;
+exports.deleteComment = deleteComment;
