@@ -8,4 +8,6 @@ router.post("/", checkAuth, quoteController.createQuote);
 
 router.get("/", quoteController.getQuotes);
 
+router.get("/:qid", quoteController.getQuoteDetail);
+
 module.exports = router;

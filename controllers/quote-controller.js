@@ -1,5 +1,6 @@
 const HttpError = require("../models/http-error");
 const Quote = require("../models/quote");
+const Comment = require("../models/comment");
 
 const QUOTES_PER_PAGE = 12;
 
@@ -45,5 +46,36 @@ const getQuotes = async (req, res, next) => {
     res.json({ quotes, totalPages: Math.ceil(totalItems / QUOTES_PER_PAGE) });
 };
 
+const getQuoteDetail = async (req, res, next) => {
+    const { qid } = req.params;
+
+    let quote;
+
+    try {
+        quote = await Quote.findById(qid);
+    } catch (err) {
+        return next(new HttpError("Falló la búsqueda del quote.", 500));
+    }
+
+    if (!quote) {
+        return next(new HttpError("El id del quote no es válido.", 404));
+    }
+
+    let comments;
+    try {
+        comments = await Comment.find({ quote: qid }).select("author content");
+    } catch (err) {
+        return next(
+            new HttpError("Falló la búsqueda de comentarios del quote.")
+        );
+    }
+
+    res.json({
+        quote,
+        comments,
+    });
+};
+
 exports.createQuote = createQuote;
 exports.getQuotes = getQuotes;
+exports.getQuoteDetail = getQuoteDetail;
