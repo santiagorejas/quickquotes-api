@@ -12,4 +12,6 @@ router.get("/:qid", quoteController.getQuoteDetail);
 
 router.patch("/:qid", checkAuth, quoteController.updateQuote);
 
+router.delete("/:qid", checkAuth, quoteController.deleteQuote);
+
 module.exports = router;

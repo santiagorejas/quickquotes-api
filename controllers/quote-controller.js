@@ -114,7 +114,42 @@ const updateQuote = async (req, res, next) => {
     });
 };
 
+const deleteQuote = async (req, res, next) => {
+    const { nickname } = req.userData;
+    const { qid } = req.params;
+
+    let quote;
+    try {
+        quote = await Quote.findById(qid);
+    } catch (err) {
+        return next(new HttpError("Error en la búsqueda del quote.", 500));
+    }
+
+    if (!quote) {
+        return next(
+            new HttpError("El quote que se desea borrar no existe.", 404)
+        );
+    }
+
+    if (quote.author != nickname) {
+        return next(
+            new HttpError("No podés borrar un quote que no sea tuyo.", 401)
+        );
+    }
+
+    try {
+        quote.remove();
+    } catch (err) {
+        return next(new HttpError("Falló el borrado del quote.", 500));
+    }
+
+    res.json({
+        message: "Quote borrado correctamente!",
+    });
+};
+
 exports.createQuote = createQuote;
 exports.getQuotes = getQuotes;
 exports.getQuoteDetail = getQuoteDetail;
 exports.updateQuote = updateQuote;
+exports.deleteQuote = deleteQuote;
