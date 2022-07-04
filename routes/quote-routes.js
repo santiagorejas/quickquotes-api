@@ -10,4 +10,6 @@ router.get("/", quoteController.getQuotes);
 
 router.get("/:qid", quoteController.getQuoteDetail);
 
+router.patch("/:qid", checkAuth, quoteController.updateQuote);
+
 module.exports = router;

@@ -76,6 +76,45 @@ const getQuoteDetail = async (req, res, next) => {
     });
 };
 
+const updateQuote = async (req, res, next) => {
+    const { qid } = req.params;
+    const { nickname } = req.userData;
+    const { content } = req.body;
+
+    let quote;
+    try {
+        quote = await Quote.findById(qid);
+    } catch (err) {
+        return next(new HttpError("Falló la búsqueda del quote.", 500));
+    }
+
+    if (!quote) {
+        return next(
+            new HttpError("El quote que se quiere modificar no existe.", 404)
+        );
+    }
+
+    if (quote.author != nickname) {
+        return next(
+            new HttpError("No podés modificar un quote no creaste.", 401)
+        );
+    }
+
+    try {
+        quote.content = content;
+        await quote.save();
+    } catch (err) {
+        return next(
+            new HttpError("Ocurrió un error en la modificación del quote.", 500)
+        );
+    }
+
+    res.json({
+        message: "Quote modificado correctamente.",
+    });
+};
+
 exports.createQuote = createQuote;
 exports.getQuotes = getQuotes;
 exports.getQuoteDetail = getQuoteDetail;
+exports.updateQuote = updateQuote;
