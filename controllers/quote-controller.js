@@ -142,8 +142,33 @@ const deleteQuote = async (req, res, next) => {
   });
 };
 
+const getQuotesByUserNickname = async (req, res, next) => {
+  let { page } = req.query;
+
+  if (!page) {
+    page = 1;
+  }
+
+  const { nickname } = req.params;
+
+  let totalItems = [];
+  let quotes = [];
+  try {
+    totalItems = await Quote.find({ nickname }).count();
+    quotes = await Quote.find({ nickname })
+      .sort({ date: -1 })
+      .skip((page - 1) * QUOTES_PER_PAGE)
+      .limit(QUOTES_PER_PAGE);
+  } catch (err) {
+    console.log(err);
+  }
+
+  res.json({ quotes });
+};
+
 exports.createQuote = createQuote;
 exports.getQuotes = getQuotes;
 exports.getQuoteDetail = getQuoteDetail;
 exports.updateQuote = updateQuote;
 exports.deleteQuote = deleteQuote;
+exports.getQuotesByUserNickname = getQuotesByUserNickname;

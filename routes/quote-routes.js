@@ -10,6 +10,8 @@ router.get("/", quoteController.getQuotes);
 
 router.get("/:qid", quoteController.getQuoteDetail);
 
+router.get("/user/:nickname", quoteController.getQuotesByUserNickname);
+
 router.patch("/:qid", checkAuth, quoteController.updateQuote);
 
 router.delete("/:qid", checkAuth, quoteController.deleteQuote);
