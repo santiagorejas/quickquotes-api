@@ -8,6 +8,8 @@ router.post("/", checkAuth, quoteController.createQuote);
 
 router.get("/", quoteController.getQuotes);
 
+router.get("/favorites", checkAuth, quoteController.getLikedQuotes);
+
 router.get("/:qid", quoteController.getQuoteDetail);
 
 router.get("/user/:nickname", quoteController.getQuotesByUserNickname);

@@ -1,6 +1,8 @@
+const mongoose = require("mongoose");
 const HttpError = require("../models/http-error");
 const Quote = require("../models/quote");
 const Comment = require("../models/comment");
+const Like = require("../models/like");
 
 const QUOTES_PER_PAGE = 12;
 
@@ -151,7 +153,7 @@ const getQuotesByUserNickname = async (req, res, next) => {
 
   const { nickname } = req.params;
 
-  let totalItems = [];
+  let totalItems = 0;
   let quotes = [];
   try {
     totalItems = await Quote.find({ nickname }).count();
@@ -160,10 +162,43 @@ const getQuotesByUserNickname = async (req, res, next) => {
       .skip((page - 1) * QUOTES_PER_PAGE)
       .limit(QUOTES_PER_PAGE);
   } catch (err) {
-    console.log(err);
+    return next(new HttpError("Fetching quotes failed.", 500));
   }
 
-  res.json({ quotes });
+  res.json({ quotes, totalPages: Math.ceil(totalItems / QUOTES_PER_PAGE) });
+};
+
+const getLikedQuotes = async (req, res, next) => {
+  let { page } = req.query;
+
+  if (!page) {
+    page = 1;
+  }
+
+  const { nickname } = req.userData;
+
+  let quotesId = [];
+  try {
+    quotesId = await Like.find({ nickname }).select("quote");
+  } catch (err) {
+    return next(new HttpError("Fetching likes failed.", 500));
+  }
+
+  quotesId = quotesId.map((data) => data.quote);
+
+  let totalItems = 0;
+  let quotes = [];
+  try {
+    totalItems = await Quote.find({ _id: { $in: quotesId } }).count();
+    quotes = await Quote.find({ _id: { $in: quotesId } })
+      .sort({ date: -1 })
+      .skip((page - 1) * QUOTES_PER_PAGE)
+      .limit(QUOTES_PER_PAGE);
+  } catch (err) {
+    return next(new HttpError("Fetching quotes failed.", 500));
+  }
+
+  res.json({ quotes, totalPages: Math.ceil(totalItems / QUOTES_PER_PAGE) });
 };
 
 exports.createQuote = createQuote;
@@ -172,3 +207,4 @@ exports.getQuoteDetail = getQuoteDetail;
 exports.updateQuote = updateQuote;
 exports.deleteQuote = deleteQuote;
 exports.getQuotesByUserNickname = getQuotesByUserNickname;
+exports.getLikedQuotes = getLikedQuotes;
