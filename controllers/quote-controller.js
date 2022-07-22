@@ -156,8 +156,8 @@ const getQuotesByUserNickname = async (req, res, next) => {
   let totalItems = 0;
   let quotes = [];
   try {
-    totalItems = await Quote.find({ nickname }).count();
-    quotes = await Quote.find({ nickname })
+    totalItems = await Quote.find({ author: nickname }).count();
+    quotes = await Quote.find({ author: nickname })
       .sort({ date: -1 })
       .skip((page - 1) * QUOTES_PER_PAGE)
       .limit(QUOTES_PER_PAGE);
@@ -179,7 +179,7 @@ const getLikedQuotes = async (req, res, next) => {
 
   let quotesId = [];
   try {
-    quotesId = await Like.find({ nickname }).select("quote");
+    quotesId = await Like.find({ user: nickname }).select("quote");
   } catch (err) {
     return next(new HttpError("Fetching likes failed.", 500));
   }
@@ -206,7 +206,7 @@ const getLikedQuotesId = async (req, res, next) => {
 
   let quotes = [];
   try {
-    quotes = await Like.find({ nickname }).select("quote");
+    quotes = await Like.find({ user: nickname }).select("quote");
   } catch (err) {
     return next(new HttpError("Fetching likes quotes id failed.", 500));
   }
