@@ -201,6 +201,21 @@ const getLikedQuotes = async (req, res, next) => {
   res.json({ quotes, totalPages: Math.ceil(totalItems / QUOTES_PER_PAGE) });
 };
 
+const getLikedQuotesId = async (req, res, next) => {
+  const { nickname } = req.userData;
+
+  let quotes = [];
+  try {
+    quotes = await Like.find({ nickname }).select("quote");
+  } catch (err) {
+    return next(new HttpError("Fetching likes quotes id failed.", 500));
+  }
+
+  quotes = quotes.map((q) => q.quote);
+
+  res.json({ quotes });
+};
+
 exports.createQuote = createQuote;
 exports.getQuotes = getQuotes;
 exports.getQuoteDetail = getQuoteDetail;
@@ -208,3 +223,4 @@ exports.updateQuote = updateQuote;
 exports.deleteQuote = deleteQuote;
 exports.getQuotesByUserNickname = getQuotesByUserNickname;
 exports.getLikedQuotes = getLikedQuotes;
+exports.getLikedQuotesId = getLikedQuotesId;

@@ -10,6 +10,8 @@ router.get("/", quoteController.getQuotes);
 
 router.get("/favorites", checkAuth, quoteController.getLikedQuotes);
 
+router.get("/favorites-id", checkAuth, quoteController.getLikedQuotesId);
+
 router.get("/:qid", quoteController.getQuoteDetail);
 
 router.get("/user/:nickname", quoteController.getQuotesByUserNickname);
